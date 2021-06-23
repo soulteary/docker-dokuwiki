@@ -1,0 +1,22 @@
+version: "2"
+
+services:
+
+  dokuwiki:
+    image: soulteary/docker-dokuwiki:2020-07-29
+    ports:
+      - 8080:80
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./pages:/var/www/html/data/pages:rw
+      - ./meta:/var/www/html/data/meta:rw
+      - ./media:/var/www/html/data/media:rw
+      - ./conf:/var/www/html/conf:rw
+      - ./plugins:/var/www/html/lib/plugins:rw
+      - ./docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh:ro
+      - ./patches:/var/www/patches:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"

@@ -1,0 +1,7 @@
+conf
+media
+meta
+pages
+plugins
+patches
+docker-compose*.yml

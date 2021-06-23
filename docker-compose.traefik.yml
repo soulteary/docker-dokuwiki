@@ -1,0 +1,42 @@
+version: "2"
+
+services:
+
+  dokuwiki:
+    image: soulteary/docker-dokuwiki:2020-07-29
+    networks:
+      - traefik
+    expose:
+      - 80
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./pages:/var/www/html/data/pages:rw
+      - ./meta:/var/www/html/data/meta:rw
+      - ./media:/var/www/html/data/media:rw
+      - ./conf:/var/www/html/conf:rw
+      - ./plugins:/var/www/html/lib/plugins:rw
+      - ./docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh:ro
+      - ./patches:/var/www/patches:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.dokuwiki-web.middlewares=https-redirect@file"
+      - "traefik.http.routers.dokuwiki-web.entrypoints=http"
+      - "traefik.http.routers.dokuwiki-web.rule=Host(`dokuwiki.wiki`)"
+      - "traefik.http.routers.dokuwiki-web.service=dashboard@internal"
+      - "traefik.http.routers.dokuwiki-ssl.entrypoints=https"
+      - "traefik.http.routers.dokuwiki-ssl.rule=Host(`dokuwiki.wiki`)"
+      - "traefik.http.routers.dokuwiki-ssl.tls=true"
+      - "traefik.http.services.dokuwiki-backend.loadbalancer.server.scheme=http"
+      - "traefik.http.services.dokuwiki-backend.loadbalancer.server.port=80"
+    extra_hosts:
+      - "dokuwiki.wiki:127.0.0.1"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+
+networks:
+  traefik:
+    external: true
